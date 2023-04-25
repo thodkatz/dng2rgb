@@ -12,7 +12,7 @@ filename = root + "assignment1/assets/RawImage.DNG";
 bayertype = "rggb";
 % bayertype = "bggr";
 % bayertype = "grbg";
-method = "linear";
+method = "nearest";
 m = 4000;
 n = 6000;
 [Csrgb, Clinear, Cxyz, Ccam] = dng2rgb(rawim, XYZ2Cam, wbcoeffs, bayertype, method, m, n);
@@ -84,12 +84,12 @@ end
 
 function Ccam = bilinear_interpolation(input_image, pattern, M, N)
     Ccam = zeros(size(input_image));
-    [r,g,b] = cfa_masks(pattern, [M, N]);
+    [r_mask,g_mask,b_mask] = cfa_masks(pattern, [M, N]);
     g_filter = [0,1,0;1,4,1;0,1,0]/4;
     rb_filter = [1,2,1;2,4,2;1,2,1]/4;
-    r = conv2(input_image .* r, rb_filter, "same");
-    b = conv2(input_image .* b, rb_filter, "same");
-    g = conv2(input_image .* g, g_filter, "same");
+    r = conv2(input_image .* r_mask, rb_filter, "same");
+    b = conv2(input_image .* b_mask, rb_filter, "same");
+    g = conv2(input_image .* g_mask, g_filter, "same");
 
     Ccam(:,:,1) = r;
     Ccam(:,:,2) = g;
@@ -122,11 +122,11 @@ end
 
 function Ccam = nearest_interpolation(input_image, pattern, M, N)
     Ccam = zeros(size(input_image));
-    [r,g,b] = cfa_masks(pattern, [M N]);
+    [r_mask,g_mask,b_mask] = cfa_masks(pattern, [M N]);
 
-    r = fill_nearest(r);
-    g = fill_nearest(g);
-    b = fill_nearest(b);
+    r = fill_nearest(input_image .* r_mask);
+    g = fill_nearest(input_image .* g_mask);
+    b = fill_nearest(input_image .* b_mask);
 
     Ccam(:,:,1) = r;
     Ccam(:,:,2) = g;
