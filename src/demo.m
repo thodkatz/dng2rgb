@@ -19,7 +19,6 @@ bayertype = "rggb";
 % bayertype = "bggr";
 % bayertype = "grbg";
 
-% unused, not implemented
 m = 4000;
 n = 6000;
 
